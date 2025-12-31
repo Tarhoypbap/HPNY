@@ -160,4 +160,45 @@
       const clean = (name || "").trim();
       const finalName = clean.length ? clean : "เพื่อนของเรา";
 
-      ti
+      titleEl.textContent = `Happy New Year, ${finalName} 🎉`;
+      msgEl.textContent = pickMessage(finalName);
+
+      // อัปเดต URL ให้แชร์ได้
+      const url = new URL(window.location.href);
+      url.searchParams.set("name", finalName);
+      window.history.replaceState({}, "", url.toString());
+
+      linkPreview.textContent = `ลิงก์นี้: ${url.toString()}`;
+
+      step1.style.display = "none";
+      step2.style.display = "block";
+    }
+
+    document.getElementById("goBtn").addEventListener("click", () => showGreeting(nameInput.value));
+    nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") showGreeting(nameInput.value); });
+
+    document.getElementById("againBtn").addEventListener("click", () => {
+      step2.style.display = "none";
+      step1.style.display = "block";
+      nameInput.value = "";
+      nameInput.focus();
+    });
+
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        const btn = document.getElementById("copyBtn");
+        btn.textContent = "คัดลอกแล้ว ✅";
+        setTimeout(() => btn.textContent = "คัดลอกลิงก์สำหรับชื่อนี้", 1400);
+      } catch {
+        alert("คัดลอกไม่ได้ (บางเครื่องบล็อก) ก็อปจากบรรทัดล่างแทนได้เลย");
+      }
+    });
+
+    // ถ้ามี name ใน query อยู่แล้ว ให้โชว์ทันที
+    const params = new URLSearchParams(window.location.search);
+    const n = params.get("name");
+    if (n) showGreeting(n);
+  </script>
+</body>
+</html>
