@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Happy New Year 🎉</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 0; background:#0b1020; color:#fff; }
+    .wrap { min-height: 100vh; display:flex; align-items:center; justify-content:center; padding: 24px; }
+    .card { width:min(520px, 100%); background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:18px; padding:22px; backdrop-filter: blur(10px); }
+    h1 { margin: 0 0 10px; font-size: 28px; }
+    p { margin: 8px 0; line-height: 1.5; opacity: .95; }
+    input { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.25); color:#fff; font-size:16px; outline:none; }
+    button { width:100%; margin-top: 12px; padding: 12px 14px; border-radius: 12px; border: 0; font-size:16px; cursor:pointer; }
+    .btn { background: #6ee7ff; color:#061018; font-weight:700; }
+    .ghost { background: rgba(255,255,255,0.10); color:#fff; }
+    .row { display:flex; gap:10px; margin-top: 12px; }
+    .row button { width: 50%; }
+    .small { font-size: 12px; opacity: .75; margin-top: 10px; }
+    .badge { display:inline-block; padding:4px 10px; border-radius: 999px; background: rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.12); font-size: 12px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="badge">✨ New Year Link Generator</div>
+
+      <div id="step1">
+        <h1>พิมพ์ชื่อก่อน 🎇</h1>
+        <p>ใส่ชื่อแล้วมันจะโชว์คำอวยพรแบบปรับตามแต่ละคน</p>
+        <input id="nameInput" placeholder="เช่น: มนุษย์ที่ฉันแคร์" maxlength="40" />
+        <button class="btn" id="goBtn">ไปต่อ</button>
+        <p class="small">ทริค: ส่งลิงก์แบบ <b>?name=Somchai</b> ก็ได้</p>
+      </div>
+
+      <div id="step2" style="display:none;">
+        <h1 id="title"></h1>
+        <p id="msg"></p>
+
+        <div class="row">
+          <button class="btn" id="copyBtn">คัดลอกลิงก์สำหรับชื่อนี้</button>
+          <button class="ghost" id="againBtn">ใส่ชื่อใหม่</button>
+        </div>
+        <p class="small" id="linkPreview"></p>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const step1 = document.getElementById("step1");
+  const step2 = document.getElementById("step2");
+  const nameInput = document.getElementById("nameInput");
+  const titleEl = document.getElementById("title");
+  const msgEl = document.getElementById("msg");
+  const linkPreview = document.getElementById("linkPreview");
+
+  function pickMessage(name) {
+    // ข้อความ custom แบบง่าย ๆ (ปรับเองได้)
+    const lower = name.toLowerCase();
+
+    if (lower.includes("หมอ") || lower.includes("doc")) {
+      return `ปี 2026 ขอให้ ${name} ไม่โดน call ดึก ๆ, นอนพอ, และคนไข้ cooperate แบบมีศีลธรรม 🙏`;
+    }
+    if (lower.includes("แฟน") || lower.includes("ที่รัก") || lower.includes("mona")) {
+      return `ปี 2026 ขอให้ ${name} ยิ้มเยอะ ๆ สุขภาพดี และถ้ามีอะไรหนัก ๆ เราผ่านมันไปด้วยกันนะ 💛`;
+    }
+    if (lower.includes("ครู") || lower.includes("อาจารย์")) {
+      return `สวัสดีปีใหม่ ${name} ขอให้ปีนี้มีแต่สิ่งดี ๆ และลูกศิษย์ไม่ทำให้ปวดหัวเกินจำเป็น 😅`;
+    }
+    // default
+    const templates = [
+      `สวัสดีปีใหม่ ${name} 🥳 ขอให้ปี 2026 เป็นปีที่โหดน้อยลง แต่เงินมากขึ้น และใจแข็งแรงขึ้น 💪`,
+      `${name} ขอให้ปี 2026 ได้เจอเรื่องดี ๆ แบบไม่ต้องพยายามมากเกินไป (โลกควรใจดีบ้าง) ✨`,
+      `Happy New Year ${name}! ขอให้ปีนี้มีแต่ข่าวดี สุขภาพดี และมีคนซัพพอร์ตแบบจริงใจ 🫶`
+    ];
+    return templates[Math.floor(Math.random() * templates.length)];
+  }
+
+  function showGreeting(name) {
+    const clean = (name || "").trim();
+    const finalName = clean.length ? clean : "เพื่อนของเรา";
+    titleEl.textContent = `Happy New Year, ${finalName} 🎉`;
+    msgEl.textContent = pickMessage(finalName);
+
+    // อัปเดต URL ให้ share ได้
+    const url = new URL(window.location.href);
+    url.searchParams.set("name", finalName);
+    window.history.replaceState({}, "", url.toString());
+
+    linkPreview.textContent = `ลิงก์นี้: ${url.toString()}`;
+    step1.style.display = "none";
+    step2.style.display = "block";
+  }
+
+  document.getElementById("goBtn").addEventListener("click", () => showGreeting(nameInput.value));
+  nameInput.addEventListener("keydown", (e) => { if (e.key === "Enter") showGreeting(nameInput.value); });
+
+  document.getElementById("againBtn").addEventListener("click", () => {
+    step2.style.display = "none";
+    step1.style.display = "block";
+    nameInput.focus();
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      document.getElementById("copyBtn").textContent = "คัดลอกแล้ว ✅";
+      setTimeout(() => document.getElementById("copyBtn").textContent = "คัดลอกลิงก์สำหรับชื่อนี้", 1400);
+    } catch {
+      alert("คัดลอกไม่ได้ (บางเครื่องบล็อก) ก็อปจากบรรทัดล่างแทนได้เลย");
+    }
+  });
+
+  // ถ้ามี name ใน query อยู่แล้ว ให้โชว์ทันที
+  const params = new URLSearchParams(window.location.search);
+  const n = params.get("name");
+  if (n) showGreeting(n);
+</script>
+</body>
+</html>
